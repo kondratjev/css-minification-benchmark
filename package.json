@@ -1,17 +1,18 @@
 {
   "name": "css-minification-benchmark",
   "version": "1.0.0",
-  "description": "Benchmark of popular CSS minification tools.",
-  "author": "Jakub Pawlowicz <jakub@goalsmashers.com>",
-  "homepage": "https://github.com/GoalSmashers/css-minification-benchmark",
+  "description": "Benchmark of popular CSS minification tools",
+  "author": "Maksim Kondratev <kondratj3v@gmail.com>",
+  "homepage": "https://github.com/kondratjev/css-minification-benchmark",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GoalSmashers/css-minification-benchmark.git"
+    "url": "git+https://github.com/kondratjev/css-minification-benchmark.git"
   },
   "bugs": {
-    "url": "https://github.com/GoalSmashers/css-minification-benchmark/issues"
+    "url": "https://github.com/kondratjev/css-minification-benchmark/issues"
   },
   "keywords": [
     "css",
@@ -19,33 +20,43 @@
     "benchmark"
   ],
   "scripts": {
-    "bench": "node ./bin/bench.js",
-    "bench-html": "node ./bin/bench.js --html>docs/index.html",
+    "bench": "bun ./bin/bench.ts",
+    "bench-html": "bun ./bin/bench.ts --html > docs/index.html",
     "check": "npm run lint",
     "lint": "xo",
     "test": "npm run lint && npm run bench"
   },
   "bin": {
-    "css-minification-benchmark": "bin/bench.js"
+    "css-minification-benchmark": "bin/bench.ts"
   },
   "main": "lib/index.js",
-  "dependencies": {},
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "animate.css": "^4.1.1",
+    "bootstrap": "^5.3.2",
+    "clean-css": "5.3.3",
+    "cssnano": "6.0.2",
+    "cssnano-preset-advanced": "6.0.2",
+    "csso": "5.0.5",
+    "esbuild": "0.19.10",
+    "lightningcss": "1.22.1",
+    "normalize.css": "^8.0.1",
+    "postcss": "8.4.32",
+    "purecss": "^3.0.0",
+    "sanitize.css": "^13.0.0",
+    "sass": "^1.69.6",
+    "tailwindcss": "^3.4.0"
+  },
   "devDependencies": {
-    "@parcel/css": "^1.0.1",
-    "clean-css": "^5.2.2",
-    "cssnano": "^5.0.15",
-    "cssnano-preset-advanced": "^5.1.10",
-    "csso": "^5.0.2",
-    "esbuild": "^0.14.11",
+    "@types/clean-css": "^4.2.11",
+    "@types/csso": "^5.0.4",
+    "bun-types": "^1.0.20",
     "gzip-size": "^6.0.0",
     "picocolors": "^1.0.0",
-    "postcss": "^8.4.5",
-    "q": "^1.5.1",
-    "table": "^6.8.0",
-    "xo": "^0.47.0"
-  },
-  "engines": {
-    "node": ">=12"
+    "prettier": "^3.1.1",
+    "table": "^6.8.1",
+    "typescript": "^5.3.3",
+    "xo": "^0.56.0"
   },
   "xo": {
     "space": true,
@@ -66,7 +77,7 @@
         "error",
         "after"
       ],
-      "promise/prefer-await-to-then": "off",
+      "no-await-in-loop": "off",
       "quote-props": [
         "error",
         "consistent"

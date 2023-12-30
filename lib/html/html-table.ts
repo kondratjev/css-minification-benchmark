@@ -1,29 +1,39 @@
-'use strict';
-
-const { benchmarkInfo } = require('./benchmark-info.js');
+import benchmarkInfo from "./benchmark-info";
 
 const htmlTable = ({ data }) => {
   const rows = [];
 
   const tableRow = (columns, tag) => {
-    const endTag = tag.replace('<', '</');
+    const endTag = tag.replace("<", "</");
     const body = [];
-    body.push('<tr>');
+    body.push("<tr>");
 
     for (const value of columns) {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         body.push(tag + value + endTag);
       } else if (value.value) {
-        body.push(tag.replace('>', ` class="${value.class}">`) + value.value + endTag);
+        body.push(
+          tag.replace(">", ` class="${value.class}">`) + value.value + endTag
+        );
       } else {
-        const size = `<span class="badge bg-${value.sizeClass}">${value.size}</span>`;
-        const time = `<span class="badge bg-${value.timeClass}">${value.time}</span>`;
-        body.push(`${tag + size}<br>${time}${endTag}`);
+        const lines = [];
+        if (value.time && value.differential) {
+          lines.push(
+            `<span class="badge bg-${value.timeClass}">${value.time} (${value.differential})</span>`
+          );
+        }
+        lines.push("<br />");
+        if (value.size) {
+          lines.push(
+            `<span class="badge bg-${value.sizeClass}">${value.size}</span>`
+          );
+        }
+        body.push(tag + lines.join("") + endTag);
       }
     }
 
-    body.push('</tr>');
-    return body.join('\n');
+    body.push("</tr>");
+    return body.join("\n");
   };
 
   const buildPage = () => {
@@ -32,23 +42,23 @@ const htmlTable = ({ data }) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CSS minification benchmark results</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <title>CSS minification benchmark V2 results</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <style>body{font-size:.9rem}.table thead th{text-align:center;vertical-align:middle}.table td{vertical-align:middle}</style>
 </head>
 <body>
   <div class="container-fluid">
     <div class="mt-2 mb-4 text-center">
-      <h1 class="h3">CSS Minification Benchmark</h1>
+      <h1 class="h3">CSS Minification Benchmark V2</h1>
       <a href="https://github.com/GoalSmashers/css-minification-benchmark" title="View the GitHub repository">GitHub</a>
     </div>
     <div class="table-responsive">
       <table class="table table-bordered table-sm table-hover table-striped">
         <thead>
-          ${tableRow(data, '<th>')}
+          ${tableRow(data, "<th>")}
         </thead>
         <tbody>
-          ${rows.map(row => tableRow(row, '<td>')).join('\n')}
+          ${rows.map((row) => tableRow(row, "<td>")).join("\n")}
         </tbody>
       </table>
     </div>
@@ -70,8 +80,8 @@ const htmlTable = ({ data }) => {
 
     toString() {
       return buildPage();
-    }
+    },
   };
 };
 
-module.exports = { htmlTable };
+export default htmlTable;

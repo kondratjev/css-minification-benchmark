@@ -1,12 +1,17 @@
-'use strict';
+const metrics = [
+  "label",
+  "time",
+  "size",
+  "gzip",
+  "originalsize",
+  "originalgzip",
+];
 
-const metrics = ['label', 'time', 'size', 'gzip', 'originalsize', 'originalgzip'];
-
-class Measure {
+export default class Measure {
   constructor(stats) {
     this.each(function (key) {
-      if (key === 'label') {
-        this[key] = stats && stats[key] ? stats[key] : '';
+      if (key === "label") {
+        this[key] = stats && stats[key] ? stats[key] : "";
       } else {
         this[key] = stats ? stats[key] : Number.NaN;
       }
@@ -20,8 +25,8 @@ class Measure {
 
   add(stats) {
     this.each(function (key) {
-      if (key === 'label') {
-        this[key] += stats && stats[key] ? stats[key] : '';
+      if (key === "label") {
+        this[key] += stats && stats[key] ? stats[key] : "";
       } else {
         this[key] += stats ? stats[key] : Number.NaN;
       }
@@ -29,8 +34,14 @@ class Measure {
   }
 
   isValid() {
-    return ('time' in this) && !Number.isNaN(this.time) && this.time !== undefined &&
-      ('size' in this) && !Number.isNaN(this.size) && this.size !== undefined;
+    return (
+      "time" in this &&
+      !Number.isNaN(this.time) &&
+      this.time !== undefined &&
+      "size" in this &&
+      !Number.isNaN(this.size) &&
+      this.size !== undefined
+    );
   }
 
   equal(key, measure) {
@@ -44,14 +55,12 @@ class Measure {
       value = Number(value.toFixed(2));
     }
 
-    if (type === 'byte') {
+    if (type === "byte") {
       return `${value} bytes`;
     }
 
-    if (type === 'time') {
+    if (type === "time") {
       return `${value} ms`;
     }
   }
 }
-
-module.exports = Measure;

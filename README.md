@@ -8,6 +8,8 @@ A comparison of CSS minification engines.
 
 ### Which engines are covered?
 
+* [lightningcss](https://github.com/parcel-bundler/lightningcss)
+* [sass](https://github.com/sass/dart-sass)
 * [clean-css](https://github.com/GoalSmashers/clean-css)
 * [cssnano](https://github.com/ben-eb/cssnano)
 * [csso](https://github.com/css/csso)

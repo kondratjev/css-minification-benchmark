@@ -1,6 +1,4 @@
-'use strict';
-
-const Measure = require('./measure.js');
+import Measure from "./measure";
 
 const allResults = {};
 const totals = {};
@@ -12,21 +10,32 @@ const comparator = function (a, b) {
 const compareResult = (result, against) => {
   const compare = {};
 
-  result.each(key => {
+  result.each((key) => {
     compare[key] = {
       best: false,
-      worst: false
+      worst: false,
+      differential: NaN,
     };
 
     const sorted = [...against].sort(comparator.bind({ key }));
     const howMany = sorted.length;
 
-    if (howMany > 1 && result.equal(key, sorted[howMany - 1]) && !result.equal(key, sorted[0])) {
+    if (
+      howMany > 1 &&
+      result.equal(key, sorted[howMany - 1]) &&
+      !result.equal(key, sorted[0])
+    ) {
       compare[key].worst = true;
     }
 
     if (howMany && result.equal(key, sorted[0])) {
       compare[key].best = true;
+    }
+
+    if (howMany > 1) {
+      compare[key].differential = Math.round(
+        ((result[key] - sorted[0][key]) / sorted[0][key]) * 100
+      );
     }
   });
 
@@ -62,11 +71,11 @@ const get = (file, minifier) => {
 
   return {
     value: result,
-    compare: compareResult(result, against)
+    compare: compareResult(result, against),
   };
 };
 
-const total = minifier => {
+const total = (minifier) => {
   const against = [];
   for (const name in totals) {
     if (Object.prototype.hasOwnProperty.call(totals, name)) {
@@ -81,12 +90,8 @@ const total = minifier => {
 
   return {
     value: result,
-    compare: compareResult(result, against)
+    compare: compareResult(result, against),
   };
 };
 
-module.exports = {
-  save,
-  get,
-  total
-};
+export { save, get, total };
