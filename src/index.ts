@@ -69,11 +69,12 @@ const getResults = async (filenames: string[], gzip: boolean) => {
       process.stderr.write(`- Processing with ${minifier.name} \n`);
 
       const measured = await measure(source, minifier, gzip);
+      const originalSize = gzip ? gzipSizeSync(source) : source.length;
 
       const measurement: Measurement = {
         minifiedSize: measured.size,
         elapsedTime: measured.time,
-        efficiency: ((measured.size / source.length) * 100).toFixed(1),
+        efficiency: ((measured.size / originalSize) * 100).toFixed(1),
         minifier: {
           name: minifier.name,
           version: minifier.version,
@@ -86,7 +87,7 @@ const getResults = async (filenames: string[], gzip: boolean) => {
       } else {
         results.set(filename, {
           filename,
-          originalSize: gzip ? gzipSizeSync(source) : source.length,
+          originalSize,
           measurements: [measurement],
           stats: {},
         });
