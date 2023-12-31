@@ -32,7 +32,7 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "esbuild",
-    version: "0.19.10",
+    version: "0.19.11",
     url: "https://github.com/evanw/esbuild",
     build: async (source: string) => {
       const result = await esbuild.transform(source, {
