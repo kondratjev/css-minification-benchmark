@@ -18,7 +18,7 @@ A comparison of modern CSS minification engines.
 
 ### How can I see the results?
 
-Clone the repository, install the dependencies with `bun install` and then run `bun run bench-html`. That's it!
+Clone the repository, install the dependencies with `bun install` and then run `bun run bench`. That's it!
 
 If you prefer to see results without cloning the repo here are [the most recent ones](https://kondratjev.github.io/css-minification-benchmark/).
 

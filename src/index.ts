@@ -1,34 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import { minifiers, type Minifier } from "./minifiers";
+import { minifiers } from "./minifiers";
 import { benchmarkInfo, renderToHtml } from "./utils";
 import { gzipSizeSync } from "gzip-size";
-
-interface Args {
-  asHtml: boolean;
-  gzip: boolean;
-}
-
-interface Measurement {
-  minifier: Omit<Minifier, "build">;
-  minifiedSize: number;
-  differential?: string;
-  efficiency: string;
-  elapsedTime: number;
-}
-
-interface TotalResult {
-  filename: string;
-  originalSize: number;
-  measurements: Measurement[];
-  stats: {
-    bestTime?: number;
-    worstTime?: number;
-    bestSize?: number;
-    worstSize?: number;
-  };
-}
+import type { Args, Measurement, Minifier, TotalResult } from "./types";
 
 const runBenchmark = async (args: Args, filenames: string[]) => {
   const results = await getResults(filenames, args.gzip);
@@ -89,7 +65,6 @@ const getResults = async (filenames: string[], gzip: boolean) => {
           filename,
           originalSize,
           measurements: [measurement],
-          stats: {},
         });
       }
     }
@@ -103,7 +78,7 @@ const getResults = async (filenames: string[], gzip: boolean) => {
 
     tempResults.measurements.forEach((measurement) => {
       measurement.differential = (
-        measurement.elapsedTime / tempResults.stats.bestTime!
+        measurement.elapsedTime / tempResults.stats!.bestTime
       ).toFixed(1);
     });
   }

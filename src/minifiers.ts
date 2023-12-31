@@ -7,13 +7,7 @@ import esbuild from "esbuild";
 import * as lightningCss from "lightningcss";
 import * as sass from "sass";
 import uglifycss from "uglifycss";
-
-export interface Minifier {
-  name: string;
-  version: string;
-  url: string;
-  build: (source: string) => Promise<string>;
-}
+import type { Minifier } from "./types";
 
 export const minifiers: Minifier[] = [
   {
