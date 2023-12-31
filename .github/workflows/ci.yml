@@ -7,29 +7,18 @@ env:
 
 jobs:
   run:
-    name: Node ${{ matrix.node }}
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [12, 14, 16]
-
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: ${{ matrix.node }}
-          cache: npm
+          bun-version: latest
 
-      - name: Install npm dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: bun i
 
-      - name: Run Lint
-        run: npm run lint
-
-      - name: Run Benchmark
-        run: npm run bench
+      - name: Run benchmark
+        run: bun run bench-html
