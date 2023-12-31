@@ -2,7 +2,7 @@
 
 ## What is css-minification-benchmark?
 
-A comparison of CSS minification engines.
+A comparison of modern CSS minification engines.
 
 ## FAQ
 
@@ -12,13 +12,13 @@ A comparison of CSS minification engines.
 * [esbuild](https://github.com/evanw/esbuild)
 * [dart-sass](https://github.com/sass/dart-sass)
 * [csso](https://github.com/css/csso)
-* [cssnano](https://github.com/ben-eb/cssnano)
-* [clean-css](https://github.com/GoalSmashers/clean-css)
+* [cssnano](https://github.com/cssnano/cssnano)
+* [clean-css](https://github.com/clean-css/clean-css)
 * [uglifycss](https://github.com/fmarcia/uglifycss)
 
 ### How can I see the results?
 
-Clone the repository, install the dependencies with `npm install` and then run `bun run bench`. That's it!
+Clone the repository, install the dependencies with `bun install` and then run `bun run bench-html`. That's it!
 
 If you prefer to see results without cloning the repo here are [the most recent ones](https://kondratjev.github.io/css-minification-benchmark/).
 
@@ -45,4 +45,4 @@ Run `bun run bench-gzip` or `bun run bench-html-gzip` to measure the gzip size i
 
 ## License
 
-css-minification-benchmark is released under the [MIT License](https://github.com/GoalSmashers/css-minification-benchmark/blob/master/LICENSE).
+css-minification-benchmark is released under the [MIT License](https://github.com/kondratjev/css-minification-benchmark/blob/master/LICENSE).
