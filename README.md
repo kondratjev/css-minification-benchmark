@@ -9,42 +9,39 @@ A comparison of CSS minification engines.
 ### Which engines are covered?
 
 * [lightningcss](https://github.com/parcel-bundler/lightningcss)
-* [sass](https://github.com/sass/dart-sass)
-* [clean-css](https://github.com/GoalSmashers/clean-css)
-* [cssnano](https://github.com/ben-eb/cssnano)
-* [csso](https://github.com/css/csso)
 * [esbuild](https://github.com/evanw/esbuild)
+* [dart-sass](https://github.com/sass/dart-sass)
+* [csso](https://github.com/css/csso)
+* [cssnano](https://github.com/ben-eb/cssnano)
+* [clean-css](https://github.com/GoalSmashers/clean-css)
+* [uglifycss](https://github.com/fmarcia/uglifycss)
 
 ### How can I see the results?
 
-Clone the repository, install the dependencies with `npm install` and then run `node ./bin/bench.js`. That's it!
+Clone the repository, install the dependencies with `npm install` and then run `bun run bench`. That's it!
 
-If you prefer to see results without cloning the repo here are [the most recent ones](https://goalsmashers.github.io/css-minification-benchmark/).
+If you prefer to see results without cloning the repo here are [the most recent ones](https://kondratjev.github.io/css-minification-benchmark/).
 
 ### How can I generate the html report?
 
-Just run `node ./bin/bench.js --html > report.html`
+Just run `bun run bench-html`
 
 ### How can I test my CSS file?
 
-Just copy your file to the `data` directory (make sure the filename ends with `.css`) and re-run the benchmark.
+Just install them using the package manager, then add the path to them in `bin/bench.ts` to the `input` array and re-run the benchmark.
 
 ### How can I add a new minifier to the list?
 
-* add it to `package.json` as a `devDependency`
-* run `npm install`
-* require it in `lib/minify.js` and add it to `minifiers` hash
-* run `npm run bench`
+* add it to `package.json` as a `dependency`
+* run `bun install`
+* require it in `src/minifiers.ts` and add it to `minifiers` array
+* run `bun run bench`
 * add it to this file in "Which engines are covered?" section above
 * send a PR (if you wish to have it included)
 
-### How can I compare a subset of minifiers?
-
-Just run `node ./bin/bench.js --only csso,cssnano` (it's turned into `/.*(csso|cssnano).*/` regex)
-
 ### Can I get the compressed gzip size as well?
 
-Run `node ./bin/bench.js --gzip` to measure the gzip size instead of the regular file size.
+Run `bun run bench-gzip` or `bun run bench-html-gzip` to measure the gzip size instead of the regular file size.
 
 ## License
 

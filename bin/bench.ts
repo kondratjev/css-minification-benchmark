@@ -1,28 +1,11 @@
 import process from "node:process";
-import { processOutput } from "../lib/process-output.js";
-import bench from "../lib/index.js";
-import "purecss/build/pure.css";
+import runBenchmark from "../src/index.js";
 
-// ARGUMENTS
-const only = process.argv.includes("--only")
-  ? new RegExp(
-      `.*(${process.argv[process.argv.indexOf("--only") + 1].replace(
-        /,/g,
-        "|"
-      )}).*`
-    )
-  : /.+/;
-const asHTML = process.argv.includes("--html");
+// Arguments
+const asHtml = process.argv.includes("--asHtml");
 const gzip = process.argv.includes("--gzip");
-const output = processOutput(asHTML, gzip);
 
-// const input = await Promise.all(
-//   filePaths.map((filePath) => {
-//     const fullPath = path.join("node_modules", filePath);
-//     return fs.readFile(fullPath, { encoding: "utf8" });
-//   })
-// );
-
+// Input css files
 const input = [
   "@fortawesome/fontawesome-free/css/all.css",
   "bootstrap/dist/css/bootstrap-grid.css",
@@ -32,6 +15,10 @@ const input = [
   "animate.css/animate.css",
   "sanitize.css/sanitize.css",
   "purecss/build/pure.css",
+  "@materializecss/materialize/dist/css/materialize.css",
+  "magic.css/dist/magic.css",
+  "bulma/css/bulma.css",
+  "uikit/dist/css/uikit.css"
 ].sort();
 
-await bench({ only, asHTML, gzip }, input, output);
+await runBenchmark({ asHtml, gzip }, input);
