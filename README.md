@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/GoalSmashers/css-minification-benchmark/workflows/CI/badge.svg)](https://github.com/GoalSmashers/css-minification-benchmark/actions?workflow=CI)
+[![Build Status](https://github.com/kondratjev/css-minification-benchmark/workflows/CI/badge.svg)](https://github.com/kondratjev/css-minification-benchmark/actions?workflow=CI)
 
 ## What is css-minification-benchmark?
 
