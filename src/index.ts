@@ -88,8 +88,12 @@ const getResults = async (filenames: string[], gzip: boolean) => {
 };
 
 const calcStats = (measurements: Measurement[]) => {
-  const allTimes = measurements.map((item) => item.elapsedTime);
-  const allSizes = measurements.map((item) => item.minifiedSize);
+  const allTimes = measurements
+    .map((measurement) => measurement.elapsedTime)
+    .filter(Boolean);
+  const allSizes = measurements
+    .map((measurement) => measurement.minifiedSize)
+    .filter(Boolean);
 
   return {
     bestTime: Math.min(...allTimes),
@@ -100,16 +104,24 @@ const calcStats = (measurements: Measurement[]) => {
 };
 
 const measure = async (source: string, minifier: Minifier, gzip: boolean) => {
-  const start = process.hrtime();
-  const minified = await minifier.build(source);
-  const [seconds, nanoseconds] = process.hrtime(start);
-  const time =
-    Math.round((1000 * seconds + nanoseconds / 1_000_000) * 100) / 100;
+  try {
+    const start = process.hrtime();
+    const minified = await minifier.build(source);
+    const [seconds, nanoseconds] = process.hrtime(start);
+    const time =
+      Math.round((1000 * seconds + nanoseconds / 1_000_000) * 100) / 100;
 
-  return {
-    time,
-    size: gzip ? gzipSizeSync(minified) : minified.length,
-  };
+    return {
+      time,
+      size: gzip ? gzipSizeSync(minified) : minified.length,
+    };
+  } catch {
+    process.stderr.write(`-- Error while processing with ${minifier.name} \n`);
+    return {
+      time: 0,
+      size: 0,
+    };
+  }
 };
 
 export default runBenchmark;

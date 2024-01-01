@@ -28,9 +28,9 @@
           <thead>
             <tr>
               <th>File</th>
-              <% data[0].measurements.forEach(result => { %>
+              <% data[0].measurements.forEach(measurement => { %>
                 <th>
-                  <a href="<%= result.minifier.url %>" target="_blank"><%= result.minifier.name %> - <%= result.minifier.version %></a>
+                  <a href="<%= measurement.minifier.url %>" target="_blank"><%= measurement.minifier.name %> - <%= measurement.minifier.version %></a>
                 </th>
               <% }) %>
             </tr>
@@ -44,13 +44,17 @@
                     <span class="badge bg-secondary"><%= row.originalSize %> bytes (100%)</span>
                   </div>
                 </td>
-                <% row.measurements.forEach(result => { %>
+                <% row.measurements.forEach(measurement => { %>
                   <td>
-                    <div class="d-flex flex-column align-items-start gap-1">
-                      <span class="badge <%- result.elapsedTime === row.stats.bestTime ? 'bg-success' : result.elapsedTime === row.stats.worstTime ? 'bg-danger' : 'bg-secondary' %>"><%= result.elapsedTime %> ms (×<%= result.differential %>)</span>
-                      <span class="badge <%- result.minifiedSize === row.stats.bestSize ? 'bg-success' : result.minifiedSize === row.stats.worstSize ? 'bg-danger' : 'bg-secondary' %>"><%= result.minifiedSize %> bytes (<%= result.efficiency %>%)</span>
-                    </div>
-                  </td>
+                    <% if (measurement.elapsedTime > 0 && measurement.minifiedSize > 0) { %>
+                      <div class="d-flex flex-column align-items-start gap-1">
+                        <span class="badge <%- measurement.elapsedTime === row.stats.bestTime ? 'bg-success' : measurement.elapsedTime === row.stats.worstTime ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.elapsedTime %> ms (×<%= measurement.differential %>)</span>
+                        <span class="badge <%- measurement.minifiedSize === row.stats.bestSize ? 'bg-success' : measurement.minifiedSize === row.stats.worstSize ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.minifiedSize %> bytes (<%= measurement.efficiency %>%)</span>
+                      </div>
+                    </td>
+                    <% } else { %>
+                      <span class="badge bg-warning text-dark">Error!</span>
+                    <% } %>
                 <% }) %>
               </tr>
             <% }) %>
@@ -59,10 +63,10 @@
       </div>
       <div class="d-flex flex-column align-items-start gap-1 mb-3">
         <div>
-          <span class="badge bg-danger">377.21 ms (×59.2)</span> - the worst result, where <code>377.21</code> is the elapsed time and <code>×59.2</code> is the coefficient of how many times slower
+          <span class="badge bg-danger">377.21 ms (×59.2)</span> - the worst measurement, where <code>377.21</code> is the elapsed time and <code>×59.2</code> is the coefficient of how many times slower
         </div>
         <div>
-          <span class="badge bg-success">25345 bytes (74.3%)</span> - the best result, where <code>25345</code> is the compressed size and <code>74.3%</code> is the percentage of the size ratio
+          <span class="badge bg-success">25345 bytes (74.3%)</span> - the best measurement, where <code>25345</code> is the compressed size and <code>74.3%</code> is the percentage of the size ratio
         </div>
       </div>
       <div class="machine-info my-2">

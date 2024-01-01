@@ -18,7 +18,8 @@ const input = [
   "@materializecss/materialize/dist/css/materialize.css",
   "magic.css/dist/magic.css",
   "bulma/css/bulma.css",
-  "uikit/dist/css/uikit.css"
+  "uikit/dist/css/uikit.css",
+  "foundation-sites/dist/css/foundation.css"
 ].sort();
 
 await runBenchmark({ asHtml, gzip }, input);
