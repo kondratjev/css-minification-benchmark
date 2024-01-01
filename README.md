@@ -6,7 +6,7 @@ A comparison of modern CSS minification engines.
 
 ## Another fork?
 
-Yes, this is a fork of the https://github.com/GoalSmashers/css-minification-benchmark repository, which is no longer supported. But I completely rewrote all the code with some improvements using Bun, TypeScript and EJS to simplify it. I also updated dependencies and added new libraries.
+Yes, this is a fork of the [GoalSmashers](https://github.com/GoalSmashers/css-minification-benchmark) repository, which is no longer maintained. But I completely rewrote all the code with some improvements using Bun, TypeScript and EJS to simplify it. I also updated dependencies and added new libraries.
 
 ## FAQ
 
