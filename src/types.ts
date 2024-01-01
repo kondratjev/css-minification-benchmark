@@ -25,7 +25,7 @@ export interface Stats {
   worstSize: number;
 }
 
-export interface TotalResult {
+export interface Result {
   filename: string;
   originalSize: number;
   measurements: Measurement[];

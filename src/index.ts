@@ -4,7 +4,7 @@ import process from "node:process";
 import { minifiers } from "./minifiers";
 import { benchmarkInfo, renderToHtml } from "./utils";
 import { gzipSizeSync } from "gzip-size";
-import type { Args, Measurement, Minifier, TotalResult } from "./types";
+import type { Args, Measurement, Minifier, Result } from "./types";
 
 const runBenchmark = async (args: Args, filenames: string[]) => {
   const results = await getResults(filenames, args.gzip);
@@ -27,7 +27,7 @@ const runBenchmark = async (args: Args, filenames: string[]) => {
 };
 
 const getResults = async (filenames: string[], gzip: boolean) => {
-  const results = new Map<string, TotalResult>();
+  const results = new Map<string, Result>();
 
   for (const filename of filenames) {
     if (!filename.endsWith(".css")) {
@@ -45,12 +45,14 @@ const getResults = async (filenames: string[], gzip: boolean) => {
       process.stderr.write(`- Processing with ${minifier.name} \n`);
 
       const measured = await measure(source, minifier, gzip);
+
       const originalSize = gzip ? gzipSizeSync(source) : source.length;
+      const efficiency = (measured.size / originalSize) * 100;
 
       const measurement: Measurement = {
         minifiedSize: measured.size,
         elapsedTime: measured.time,
-        efficiency: ((measured.size / originalSize) * 100).toFixed(1),
+        efficiency: efficiency.toFixed(1),
         minifier: {
           name: minifier.name,
           version: minifier.version,
@@ -77,18 +79,18 @@ const getResults = async (filenames: string[], gzip: boolean) => {
     tempResults.stats = calcStats(tempResults.measurements);
 
     tempResults.measurements.forEach((measurement) => {
-      measurement.differential = (
-        measurement.elapsedTime / tempResults.stats!.bestTime
-      ).toFixed(1);
+      const differential =
+        measurement.elapsedTime / tempResults.stats!.bestTime;
+      measurement.differential = differential.toFixed(1);
     });
   }
 
   return results;
 };
 
-const calcStats = (results: Measurement[]) => {
-  const allTimes = results.map((item) => item.elapsedTime);
-  const allSizes = results.map((item) => item.minifiedSize);
+const calcStats = (measurements: Measurement[]) => {
+  const allTimes = measurements.map((item) => item.elapsedTime);
+  const allSizes = measurements.map((item) => item.minifiedSize);
 
   return {
     bestTime: Math.min(...allTimes),
