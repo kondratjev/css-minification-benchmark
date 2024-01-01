@@ -7,6 +7,8 @@ import { gzipSizeSync } from "gzip-size";
 import type { Args, CssFile, Measurement, Minifier, Result } from "../types";
 
 const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
+  cssFiles.sort((a, b) => a.name.localeCompare(b.name));
+
   const data = await getResults(cssFiles, args.gzip);
 
   if (data) {

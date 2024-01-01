@@ -55,7 +55,7 @@ export const minifiers: Minifier[] = [
   {
     name: "csso",
     version: "5.0.5",
-    description: "restructure disabled",
+    description: "restructure off",
     url: "https://github.com/css/csso",
     build: async (source: string) => {
       return csso.minify(source, { restructure: false }).css;

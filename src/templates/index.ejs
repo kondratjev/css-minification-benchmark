@@ -12,7 +12,6 @@
       rel="stylesheet"
       crossorigin="anonymous"
     />
-    <style>body{font-size:.9rem}.table thead th{text-align:center;vertical-align:middle}.table td{vertical-align:middle}</style>
   </head>
   <body>
     <div class="container-fluid">
@@ -27,9 +26,9 @@
         <table class="table table-bordered table-sm table-hover table-striped">
           <thead>
             <tr>
-              <th>File</th>
+              <th class="align-middle text-center">File</th>
               <% data[0].measurements.forEach(measurement => { %>
-                <th>
+                <th class="align-middle text-center">
                   <div class="d-flex flex-column">
                     <a href="<%= measurement.minifier.url %>" target="_blank"><%= measurement.minifier.name %> - <%= measurement.minifier.version %></a>
                     <span><%= measurement.minifier?.description ?? "-" %></span>
@@ -41,14 +40,14 @@
           <tbody>
             <% data.forEach(row => { %>
               <tr>
-                <td>
+                <td class="align-middle">
                   <div class="d-flex flex-column align-items-start gap-1">
                     <span><%= row.filename %></span>
                     <span class="badge bg-secondary"><%= row.originalSizeLabel %> (100%)</span>
                   </div>
                 </td>
                 <% row.measurements.forEach(measurement => { %>
-                  <td>
+                  <td class="align-middle">
                     <% if (measurement.elapsedTime > 0 && measurement.minifiedSize > 0) { %>
                       <div class="d-flex flex-column align-items-start gap-1">
                         <span class="badge <%- measurement.elapsedTime === row.stats.bestTime ? 'bg-success' : measurement.elapsedTime === row.stats.worstTime ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.elapsedTime %> ms (×<%= measurement.differential %>)</span>

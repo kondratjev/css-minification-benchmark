@@ -13,31 +13,31 @@ const input: CssFile[] = [
     path: "@fortawesome/fontawesome-free/css/all.css",
   },
   {
-    name: "Bootstrap",
+    name: "Bootstrap 5",
     path: "bootstrap/dist/css/bootstrap.css",
   },
   {
-    name: "Normalize",
+    name: "Normalize.css",
     path: "normalize.css/normalize.css",
   },
   {
-    name: "Animate",
+    name: "Animate.css",
     path: "animate.css/animate.css",
   },
   {
-    name: "Sanitize",
+    name: "Sanitize.css",
     path: "sanitize.css/sanitize.css",
   },
   {
-    name: "Pure",
+    name: "Pure.css",
     path: "purecss/build/pure.css",
   },
   {
-    name: "Materialize",
+    name: "Materialize.css",
     path: "@materializecss/materialize/dist/css/materialize.css",
   },
   {
-    name: "Magic",
+    name: "Magic.css",
     path: "magic.css/dist/magic.css",
   },
   {
@@ -65,9 +65,9 @@ const input: CssFile[] = [
     path: "milligram/dist/milligram.css",
   },
   {
-    name: "Spectre",
+    name: "Spectre.css",
     path: "spectre.css/dist/spectre.css",
   },
-].sort();
+];
 
 await runBenchmark({ asHtml, gzip }, input);
