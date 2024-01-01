@@ -1,14 +1,12 @@
 [![Build Status](https://github.com/kondratjev/css-minification-benchmark/workflows/CI/badge.svg)](https://github.com/kondratjev/css-minification-benchmark/actions?workflow=CI)
 
-## What is css-minification-benchmark?
+## css-minification-benchmark
 
 A comparison of modern CSS minification engines.
 
-## Another fork?
+### Another fork?
 
 Yes, this is a fork of the [GoalSmashers](https://github.com/GoalSmashers/css-minification-benchmark) repository, which is no longer maintained. But I completely rewrote all the code with some improvements using Bun, TypeScript and EJS to simplify it. I also updated dependencies and added new libraries.
-
-## FAQ
 
 ### Which engines are covered?
 
