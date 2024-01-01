@@ -19,3 +19,11 @@ export const renderToHtml = async (
   const layout = await ejs.renderFile(templatePath, data);
   await fs.writeFile("docs/index.html", layout, "utf8");
 };
+
+export const bytesToSize = (bytes: number) => {
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  if (bytes === 0) return "N/A";
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString());
+  if (i === 0) return `${bytes} ${sizes[i]}`;
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+};

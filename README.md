@@ -10,11 +10,10 @@ A comparison of modern CSS minification engines.
 
 * [lightningcss](https://github.com/parcel-bundler/lightningcss)
 * [esbuild](https://github.com/evanw/esbuild)
-* [dart-sass](https://github.com/sass/dart-sass)
+* [sass](https://github.com/sass/dart-sass)
 * [csso](https://github.com/css/csso)
 * [cssnano](https://github.com/cssnano/cssnano)
 * [clean-css](https://github.com/clean-css/clean-css)
-* [uglifycss](https://github.com/fmarcia/uglifycss)
 
 ### How can I see the results?
 

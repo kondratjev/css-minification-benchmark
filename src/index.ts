@@ -2,12 +2,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { minifiers } from "./minifiers";
-import { benchmarkInfo, renderToHtml } from "./utils";
+import { benchmarkInfo, bytesToSize, renderToHtml } from "./utils";
 import { gzipSizeSync } from "gzip-size";
-import type { Args, Measurement, Minifier, Result } from "./types";
+import type { Args, CssFile, Measurement, Minifier, Result } from "../types";
 
-const runBenchmark = async (args: Args, filenames: string[]) => {
-  const data = await getResults(filenames, args.gzip);
+const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
+  const data = await getResults(cssFiles, args.gzip);
 
   if (data) {
     if (args.asHtml) {
@@ -25,18 +25,18 @@ const runBenchmark = async (args: Args, filenames: string[]) => {
   }
 };
 
-const getResults = async (filenames: string[], gzip: boolean) => {
+const getResults = async (cssFiles: CssFile[], gzip: boolean) => {
   const results = new Map<string, Result>();
 
-  for (const filename of filenames) {
-    if (!filename.endsWith(".css")) {
+  for (const cssFile of cssFiles) {
+    if (!cssFile.path.endsWith(".css")) {
       return;
     }
 
-    process.stderr.write(`Reading ${filename} \n`);
+    process.stderr.write(`Reading ${cssFile.name} \n`);
 
     const source = await fs.readFile(
-      path.join("node_modules", filename),
+      path.join("node_modules", cssFile.path),
       "utf8"
     );
 
@@ -50,27 +50,30 @@ const getResults = async (filenames: string[], gzip: boolean) => {
 
       const measurement: Measurement = {
         minifiedSize: measured.size,
+        minifiedSizeLabel: bytesToSize(measured.size),
         elapsedTime: measured.time,
-        efficiency: efficiency.toFixed(1),
+        efficiency: efficiency.toFixed(2),
         minifier: {
           name: minifier.name,
           version: minifier.version,
           url: minifier.url,
+          description: minifier.description,
         },
       };
 
-      if (results.has(filename)) {
-        results.get(filename)?.measurements.push(measurement);
+      if (results.has(cssFile.path)) {
+        results.get(cssFile.path)?.measurements.push(measurement);
       } else {
-        results.set(filename, {
-          filename,
+        results.set(cssFile.path, {
+          filename: cssFile.name,
           originalSize,
+          originalSizeLabel: bytesToSize(originalSize),
           measurements: [measurement],
         });
       }
     }
 
-    const tempResults = results.get(filename)!;
+    const tempResults = results.get(cssFile.path)!;
 
     tempResults.stats = calcStats(tempResults.measurements);
 
@@ -115,8 +118,8 @@ const measure = async (source: string, minifier: Minifier, gzip: boolean) => {
       time,
       size: gzip ? gzipSizeSync(minified) : minified.length,
     };
-  } catch {
-    process.stderr.write(`-- Error while processing with ${minifier.name} \n`);
+  } catch (err: unknown) {
+    console.error(`-- ${(err as Error).name}: ${(err as Error).message}`);
     return {
       time: 0,
       size: 0,

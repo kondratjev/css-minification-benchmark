@@ -6,8 +6,7 @@ import * as csso from "csso";
 import esbuild from "esbuild";
 import * as lightningCss from "lightningcss";
 import * as sass from "sass";
-import uglifycss from "uglifycss";
-import type { Minifier } from "./types";
+import type { Minifier } from "../types";
 
 export const minifiers: Minifier[] = [
   {
@@ -37,7 +36,7 @@ export const minifiers: Minifier[] = [
     },
   },
   {
-    name: "dart-sass",
+    name: "sass",
     version: "1.69.6",
     url: "https://github.com/sass/dart-sass",
     build: async (source: string) => {
@@ -47,14 +46,25 @@ export const minifiers: Minifier[] = [
   {
     name: "csso",
     version: "5.0.5",
+    description: "default",
     url: "https://github.com/css/csso",
     build: async (source: string) => {
       return csso.minify(source).css;
     },
   },
   {
+    name: "csso",
+    version: "5.0.5",
+    description: "restructure disabled",
+    url: "https://github.com/css/csso",
+    build: async (source: string) => {
+      return csso.minify(source, { restructure: false }).css;
+    },
+  },
+  {
     name: "cssnano",
     version: "6.0.2",
+    description: "default",
     url: "https://github.com/cssnano/cssnano",
     build: async (source: string) => {
       const result = await cssnano().process(source, {
@@ -64,19 +74,33 @@ export const minifiers: Minifier[] = [
     },
   },
   {
-    name: "clean-css",
-    version: "5.3.3",
-    url: "https://github.com/clean-css/clean-css",
+    name: "cssnano",
+    version: "6.0.2",
+    description: "advanced, unsafe",
+    url: "https://github.com/cssnano/cssnano",
     build: async (source: string) => {
-      return new CleanCSS({ level: 2 }).minify(source).styles;
+      const result = await cssnano({ preset: "advanced" }).process(source, {
+        from: undefined,
+      });
+      return result.css;
     },
   },
   {
-    name: "uglifycss",
-    version: "0.0.29",
-    url: "https://github.com/fmarcia/uglifycss",
+    name: "clean-css",
+    version: "5.3.3",
+    description: "level 1",
+    url: "https://github.com/clean-css/clean-css",
     build: async (source: string) => {
-      return uglifycss.processString(source);
+      return new CleanCSS({ level: 1 }).minify(source).styles;
+    },
+  },
+  {
+    name: "clean-css",
+    version: "5.3.3",
+    description: "level 2",
+    url: "https://github.com/clean-css/clean-css",
+    build: async (source: string) => {
+      return new CleanCSS({ level: 2 }).minify(source).styles;
     },
   },
 ];

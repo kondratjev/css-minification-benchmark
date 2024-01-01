@@ -30,7 +30,10 @@
               <th>File</th>
               <% data[0].measurements.forEach(measurement => { %>
                 <th>
-                  <a href="<%= measurement.minifier.url %>" target="_blank"><%= measurement.minifier.name %> - <%= measurement.minifier.version %></a>
+                  <div class="d-flex flex-column">
+                    <a href="<%= measurement.minifier.url %>" target="_blank"><%= measurement.minifier.name %> - <%= measurement.minifier.version %></a>
+                    <span><%= measurement.minifier?.description ?? "-" %></span>
+                  </div>
                 </th>
               <% }) %>
             </tr>
@@ -41,7 +44,7 @@
                 <td>
                   <div class="d-flex flex-column align-items-start gap-1">
                     <span><%= row.filename %></span>
-                    <span class="badge bg-secondary"><%= row.originalSize %> bytes (100%)</span>
+                    <span class="badge bg-secondary"><%= row.originalSizeLabel %> (100%)</span>
                   </div>
                 </td>
                 <% row.measurements.forEach(measurement => { %>
@@ -49,7 +52,7 @@
                     <% if (measurement.elapsedTime > 0 && measurement.minifiedSize > 0) { %>
                       <div class="d-flex flex-column align-items-start gap-1">
                         <span class="badge <%- measurement.elapsedTime === row.stats.bestTime ? 'bg-success' : measurement.elapsedTime === row.stats.worstTime ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.elapsedTime %> ms (×<%= measurement.differential %>)</span>
-                        <span class="badge <%- measurement.minifiedSize === row.stats.bestSize ? 'bg-success' : measurement.minifiedSize === row.stats.worstSize ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.minifiedSize %> bytes (<%= measurement.efficiency %>%)</span>
+                        <span class="badge <%- measurement.minifiedSize === row.stats.bestSize ? 'bg-success' : measurement.minifiedSize === row.stats.worstSize ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.minifiedSizeLabel %> (<%= measurement.efficiency %>%)</span>
                       </div>
                     </td>
                     <% } else { %>
