@@ -7,10 +7,9 @@ import { gzipSizeSync } from "gzip-size";
 import type { Args, Measurement, Minifier, Result } from "./types";
 
 const runBenchmark = async (args: Args, filenames: string[]) => {
-  const results = await getResults(filenames, args.gzip);
+  const data = await getResults(filenames, args.gzip);
 
-  if (results) {
-    const data = Array.from(results.values());
+  if (data) {
     if (args.asHtml) {
       await renderToHtml("templates/index.ejs", {
         data,
@@ -71,21 +70,21 @@ const getResults = async (filenames: string[], gzip: boolean) => {
       }
     }
 
-    const tempResults = results.get(filename);
-    if (!tempResults) {
-      return;
-    }
+    const tempResults = results.get(filename)!;
 
     tempResults.stats = calcStats(tempResults.measurements);
 
-    tempResults.measurements.forEach((measurement) => {
+    tempResults.measurements = tempResults.measurements.map((measurement) => {
       const differential =
         measurement.elapsedTime / tempResults.stats!.bestTime;
-      measurement.differential = differential.toFixed(1);
+      return {
+        ...measurement,
+        differential: differential.toFixed(1),
+      };
     });
   }
 
-  return results;
+  return Array.from(results.values());
 };
 
 const calcStats = (measurements: Measurement[]) => {
