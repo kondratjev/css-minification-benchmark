@@ -1,8 +1,7 @@
 import os from "node:os";
+import { Buffer } from "node:buffer";
 import Bun from "bun";
 import ejs from "ejs";
-import fs from "node:fs/promises";
-import path from "node:path";
 
 export const benchmarkInfo = {
   date: new Date().toUTCString(),
@@ -15,9 +14,9 @@ export const renderToHtml = async (
   template: string,
   data: Record<string, any>
 ) => {
-  const templatePath = path.resolve(import.meta.dir, template);
+  const templatePath = await Bun.resolve(template, import.meta.dir);
   const layout = await ejs.renderFile(templatePath, data);
-  await fs.writeFile("docs/index.html", layout, "utf8");
+  await Bun.write("./docs/index.html", layout);
 };
 
 export const bytesToSize = (bytes: number) => {
@@ -26,4 +25,8 @@ export const bytesToSize = (bytes: number) => {
   const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString());
   if (i === 0) return `${bytes} ${sizes[i]}`;
   return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+};
+
+export const getGzipSize = (source: string) => {
+  return Bun.gzipSync(Buffer.from(source), { level: 9 }).length;
 };

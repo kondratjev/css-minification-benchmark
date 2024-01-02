@@ -1,9 +1,7 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import process from "node:process";
+import Bun from "bun";
 import { minifiers } from "./minifiers";
-import { benchmarkInfo, bytesToSize, renderToHtml } from "./utils";
-import { gzipSizeSync } from "gzip-size";
+import { benchmarkInfo, bytesToSize, getGzipSize, renderToHtml } from "./utils";
 import type { Args, CssFile, Measurement, Minifier, Result } from "../types";
 
 const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
@@ -11,12 +9,12 @@ const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
 
   if (data.length) {
     if (args.asHtml) {
-      await renderToHtml("templates/index.ejs", {
+      await renderToHtml("./templates/index.ejs", {
         data,
         info: benchmarkInfo,
       });
     } else {
-      await fs.writeFile("docs/result.json", JSON.stringify(data), "utf8");
+      await Bun.write("./docs/result.json", JSON.stringify(data));
     }
 
     process.stderr.write("Successfully done!");
@@ -42,12 +40,10 @@ const getResults = async (
     process.stderr.write(`Reading ${cssFile.name}\n`);
 
     try {
-      const source = await fs.readFile(
-        path.join("node_modules", cssFile.path),
-        "utf8"
-      );
+      const sourcePath = await Bun.resolve(cssFile.path, "node_modules");
+      const source = await Bun.file(sourcePath).text();
 
-      const originalSize = gzip ? gzipSizeSync(source) : source.length;
+      const originalSize = gzip ? getGzipSize(source) : source.length;
 
       for (const minifier of minifiers) {
         process.stderr.write(`- Processing with ${minifier.name}\n`);
@@ -119,15 +115,14 @@ const calcStats = (measurements: Measurement[]) => {
 
 const measure = async (source: string, minifier: Minifier, gzip: boolean) => {
   try {
-    const start = process.hrtime();
+    const start = Bun.nanoseconds();
     const minified = await minifier.build(source);
-    const [seconds, nanoseconds] = process.hrtime(start);
-    const time =
-      Math.round((1000 * seconds + nanoseconds / 1_000_000) * 100) / 100;
+    const nanoseconds = Bun.nanoseconds() - start;
+    const time = Math.round((nanoseconds / 1_000_000) * 100) / 100;
 
     return {
       time,
-      size: gzip ? gzipSizeSync(minified) : minified.length,
+      size: gzip ? getGzipSize(minified) : minified.length,
     };
   } catch (err: unknown) {
     console.error(`-- ${(err as Error).name}: ${(err as Error).message}`);
