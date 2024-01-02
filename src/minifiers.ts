@@ -46,7 +46,6 @@ export const minifiers: Minifier[] = [
   {
     name: "csso",
     version: "5.0.5",
-    description: "default",
     url: "https://github.com/css/csso",
     build: async (source: string) => {
       return csso.minify(source).css;
@@ -64,7 +63,6 @@ export const minifiers: Minifier[] = [
   {
     name: "cssnano",
     version: "6.0.2",
-    description: "default",
     url: "https://github.com/cssnano/cssnano",
     build: async (source: string) => {
       const result = await cssnano().process(source, {

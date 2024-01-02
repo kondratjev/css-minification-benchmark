@@ -40,6 +40,7 @@
     "csso": "5.0.5",
     "ejs": "^3.1.9",
     "esbuild": "0.19.11",
+    "fomantic-ui": "^2.9.3",
     "foundation-sites": "^6.8.1",
     "gzip-size": "^7.0.0",
     "lightningcss": "1.22.1",

@@ -7,11 +7,9 @@ import { gzipSizeSync } from "gzip-size";
 import type { Args, CssFile, Measurement, Minifier, Result } from "../types";
 
 const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
-  cssFiles.sort((a, b) => a.name.localeCompare(b.name));
-
   const data = await getResults(cssFiles, args.gzip);
 
-  if (data) {
+  if (data.length) {
     if (args.asHtml) {
       await renderToHtml("templates/index.ejs", {
         data,
@@ -27,66 +25,77 @@ const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
   }
 };
 
-const getResults = async (cssFiles: CssFile[], gzip: boolean) => {
+const getResults = async (
+  cssFiles: CssFile[],
+  gzip: boolean
+): Promise<Result[]> => {
   const results = new Map<string, Result>();
+
+  cssFiles.sort((a, b) => a.name.localeCompare(b.name));
 
   for (const cssFile of cssFiles) {
     if (!cssFile.path.endsWith(".css")) {
-      return;
+      console.error(`Error reading ${cssFile.name}: The file should be CSS`);
+      continue;
     }
 
-    process.stderr.write(`Reading ${cssFile.name} \n`);
+    process.stderr.write(`Reading ${cssFile.name}\n`);
 
-    const source = await fs.readFile(
-      path.join("node_modules", cssFile.path),
-      "utf8"
-    );
-
-    for (const minifier of minifiers) {
-      process.stderr.write(`- Processing with ${minifier.name} \n`);
-
-      const measured = await measure(source, minifier, gzip);
+    try {
+      const source = await fs.readFile(
+        path.join("node_modules", cssFile.path),
+        "utf8"
+      );
 
       const originalSize = gzip ? gzipSizeSync(source) : source.length;
-      const efficiency = (measured.size / originalSize) * 100;
 
-      const measurement: Measurement = {
-        minifiedSize: measured.size,
-        minifiedSizeLabel: bytesToSize(measured.size),
-        elapsedTime: measured.time,
-        efficiency: efficiency.toFixed(2),
-        minifier: {
-          name: minifier.name,
-          version: minifier.version,
-          url: minifier.url,
-          description: minifier.description,
-        },
-      };
+      for (const minifier of minifiers) {
+        process.stderr.write(`- Processing with ${minifier.name}\n`);
 
-      if (results.has(cssFile.path)) {
-        results.get(cssFile.path)?.measurements.push(measurement);
-      } else {
-        results.set(cssFile.path, {
+        const measured = await measure(source, minifier, gzip);
+
+        const efficiency = ((measured.size / originalSize) * 100).toFixed(2);
+
+        const measurement: Measurement = {
+          minifiedSize: measured.size,
+          minifiedSizeLabel: bytesToSize(measured.size),
+          elapsedTime: measured.time,
+          efficiency,
+          minifier: {
+            name: minifier.name,
+            version: minifier.version,
+            url: minifier.url,
+            description: minifier.description,
+          },
+        };
+
+        const root = results.get(cssFile.path) ?? {
           filename: cssFile.name,
           originalSize,
           originalSizeLabel: bytesToSize(originalSize),
-          measurements: [measurement],
-        });
+          measurements: [],
+        };
+        root.measurements.push(measurement);
+        results.set(cssFile.path, root);
       }
+
+      const tempResults = results.get(cssFile.path)!;
+
+      tempResults.stats = calcStats(tempResults.measurements);
+
+      tempResults.measurements = tempResults.measurements.map((measurement) => {
+        const differential =
+          measurement.elapsedTime / tempResults.stats!.bestTime;
+        return {
+          ...measurement,
+          differential: differential.toFixed(1),
+        };
+      });
+    } catch (error) {
+      console.error(
+        `- Error reading ${cssFile.name}: ${(error as Error).message}`
+      );
     }
-
-    const tempResults = results.get(cssFile.path)!;
-
-    tempResults.stats = calcStats(tempResults.measurements);
-
-    tempResults.measurements = tempResults.measurements.map((measurement) => {
-      const differential =
-        measurement.elapsedTime / tempResults.stats!.bestTime;
-      return {
-        ...measurement,
-        differential: differential.toFixed(1),
-      };
-    });
   }
 
   return Array.from(results.values());

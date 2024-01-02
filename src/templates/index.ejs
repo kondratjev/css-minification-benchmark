@@ -36,7 +36,7 @@
                 <th class="align-middle text-center">
                   <div class="d-flex flex-column">
                     <a href="<%= measurement.minifier.url %>" target="_blank"><%= measurement.minifier.name %> - <%= measurement.minifier.version %></a>
-                    <span><%= measurement.minifier?.description ?? "-" %></span>
+                    <span><%= measurement.minifier?.description ?? "default" %></span>
                   </div>
                 </th>
               <% }) %>
@@ -48,15 +48,23 @@
                 <td class="align-middle">
                   <div class="d-flex flex-column align-items-start gap-1">
                     <span><%= row.filename %></span>
-                    <span class="badge bg-secondary"><%= row.originalSizeLabel %> (100%)</span>
+                    <span class="badge bg-secondary"><%= row.originalSizeLabel %></span>
                   </div>
                 </td>
                 <% row.measurements.forEach(measurement => { %>
                   <td class="align-middle">
                     <% if (measurement.elapsedTime > 0 && measurement.minifiedSize > 0) { %>
                       <div class="d-flex flex-column align-items-start gap-1">
-                        <span class="badge <%- measurement.elapsedTime === row.stats.bestTime ? 'bg-success' : measurement.elapsedTime === row.stats.worstTime ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.elapsedTime %> ms (×<%= measurement.differential %>)</span>
-                        <span class="badge <%- measurement.minifiedSize === row.stats.bestSize ? 'bg-success' : measurement.minifiedSize === row.stats.worstSize ? 'bg-danger' : 'bg-secondary' %>"><%= measurement.minifiedSizeLabel %> (<%= measurement.efficiency %>%)</span>
+                        <div class="d-flex gap-1">
+                          <% const timeBadgeClass = measurement.elapsedTime === row.stats.bestTime ? 'bg-success' : measurement.elapsedTime === row.stats.worstTime ? 'bg-danger' : 'bg-secondary' %>
+                          <span class="badge <%= timeBadgeClass %>"><%= measurement.elapsedTime %> ms </span>
+                          <span class="badge <%= timeBadgeClass %>">×<%= measurement.differential %></span>
+                        </div>
+                        <div class="d-flex gap-1">
+                          <% const sizeBadgeClass = measurement.minifiedSize === row.stats.bestSize ? 'bg-success' : measurement.minifiedSize === row.stats.worstSize ? 'bg-danger' : 'bg-secondary' %>
+                          <span class="badge <%= sizeBadgeClass %>"><%= measurement.minifiedSizeLabel %></span>
+                          <span class="badge <%= sizeBadgeClass %>"><%= measurement.efficiency %>%</span>
+                        </div>
                       </div>
                     </td>
                     <% } else { %>

@@ -56,6 +56,7 @@ const input: CssFile[] = [
     name: "Semantic UI",
     path: "semantic-ui/dist/semantic.css",
   },
+  { name: "Fomantic UI", path: "fomantic-ui/dist/semantic.css" },
   {
     name: "Tachyons",
     path: "tachyons/css/tachyons.css",
