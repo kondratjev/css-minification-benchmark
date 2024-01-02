@@ -1,5 +1,5 @@
 import process from "node:process";
-import runBenchmark from "../src/index.ts";
+import runBenchmark from "../lib";
 import type { CssFile } from "../types";
 
 // Arguments
