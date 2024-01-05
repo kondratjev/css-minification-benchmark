@@ -8,16 +8,24 @@ export interface CssFile {
   path: string;
 }
 
+export interface CssFileWithContent extends CssFile {
+  content: string;
+  size: number;
+}
+
 export interface Minifier {
   name: string;
-  version: string;
   description?: string;
   url: string;
   build: (source: string) => Promise<string>;
 }
 
+export interface MinifierWithVersion extends Minifier {
+  version: string;
+}
+
 export interface Measurement {
-  minifier: Omit<Minifier, "build">;
+  minifier: Omit<MinifierWithVersion, "build">;
   minifiedSize: number;
   minifiedSizeLabel: string;
   differential?: string;

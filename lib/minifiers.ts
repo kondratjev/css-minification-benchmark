@@ -6,12 +6,12 @@ import * as csso from "csso";
 import esbuild from "esbuild";
 import * as lightningCss from "lightningcss";
 import * as sass from "sass";
-import type { Minifier } from "../types";
+import type { Minifier, MinifierWithVersion } from "../types";
+import { getMinifierVersion } from "./utils";
 
-export const minifiers: Minifier[] = [
+const minifiers: Minifier[] = [
   {
     name: "lightningcss",
-    version: "1.22.1",
     url: "https://github.com/parcel-bundler/lightningcss",
     build: async (source: string) => {
       return lightningCss
@@ -25,7 +25,6 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "esbuild",
-    version: "0.19.11",
     url: "https://github.com/evanw/esbuild",
     build: async (source: string) => {
       const result = await esbuild.transform(source, {
@@ -37,7 +36,6 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "sass",
-    version: "1.69.6",
     url: "https://github.com/sass/dart-sass",
     build: async (source: string) => {
       return sass.compileString(source, { style: "compressed" }).css;
@@ -45,7 +43,6 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "csso",
-    version: "5.0.5",
     url: "https://github.com/css/csso",
     build: async (source: string) => {
       return csso.minify(source).css;
@@ -53,7 +50,6 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "csso",
-    version: "5.0.5",
     description: "restructure off",
     url: "https://github.com/css/csso",
     build: async (source: string) => {
@@ -62,7 +58,6 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "cssnano",
-    version: "6.0.2",
     url: "https://github.com/cssnano/cssnano",
     build: async (source: string) => {
       const result = await cssnano().process(source, {
@@ -73,7 +68,6 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "cssnano",
-    version: "6.0.2",
     description: "advanced, unsafe",
     url: "https://github.com/cssnano/cssnano",
     build: async (source: string) => {
@@ -85,20 +79,27 @@ export const minifiers: Minifier[] = [
   },
   {
     name: "clean-css",
-    version: "5.3.3",
-    description: "level 1",
-    url: "https://github.com/clean-css/clean-css",
-    build: async (source: string) => {
-      return new CleanCSS({ level: 1 }).minify(source).styles;
-    },
-  },
-  {
-    name: "clean-css",
-    version: "5.3.3",
     description: "level 2",
     url: "https://github.com/clean-css/clean-css",
     build: async (source: string) => {
       return new CleanCSS({ level: 2 }).minify(source).styles;
     },
   },
+  {
+    name: "clean-css",
+    description: "level 2, all rules",
+    url: "https://github.com/clean-css/clean-css",
+    build: async (source: string) => {
+      return new CleanCSS({ level: { 2: { all: true } } }).minify(source)
+        .styles;
+    },
+  },
 ];
+
+export const getMinifiers = (): Promise<MinifierWithVersion[]> => {
+  const minifiersPromises = minifiers.map(async (minifier) => ({
+    ...minifier,
+    version: await getMinifierVersion(minifier.name),
+  }));
+  return Promise.all(minifiersPromises);
+};

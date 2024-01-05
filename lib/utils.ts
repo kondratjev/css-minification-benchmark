@@ -1,4 +1,5 @@
 import os from "node:os";
+import path from "node:path";
 import { Buffer } from "node:buffer";
 import Bun from "bun";
 import ejs from "ejs";
@@ -29,4 +30,10 @@ export const bytesToSize = (bytes: number) => {
 
 export const getGzipSize = (source: string) => {
   return Bun.gzipSync(Buffer.from(source), { level: 9 }).length;
+};
+
+export const getMinifierVersion = async (name: string): Promise<string> => {
+  const packageJsonPath = path.join("node_modules", name, "package.json");
+  const packageJsonContent = await Bun.file(packageJsonPath).json();
+  return packageJsonContent.version;
 };

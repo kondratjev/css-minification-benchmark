@@ -1,8 +1,16 @@
 import process from "node:process";
 import Bun from "bun";
-import { minifiers } from "./minifiers";
+import path from "node:path";
+import { getMinifiers } from "./minifiers";
 import { benchmarkInfo, bytesToSize, getGzipSize, renderToHtml } from "./utils";
-import type { Args, CssFile, Measurement, Minifier, Result } from "../types";
+import type {
+  Args,
+  CssFile,
+  CssFileWithContent,
+  Measurement,
+  MinifierWithVersion,
+  Result,
+} from "../types";
 
 const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
   const data = await getResults(cssFiles, args.gzip);
@@ -23,78 +31,75 @@ const runBenchmark = async (args: Args, cssFiles: CssFile[]) => {
   }
 };
 
-const getResults = async (
-  cssFiles: CssFile[],
-  gzip: boolean
-): Promise<Result[]> => {
-  const results = new Map<string, Result>();
+export const getResults = async (cssFiles: CssFile[], gzip: boolean) => {
+  // Get minifiers
+  const minifiers = await getMinifiers();
 
-  cssFiles.sort((a, b) => a.name.localeCompare(b.name));
+  // Read all files and sort them
+  const files = await readFiles(cssFiles, gzip);
 
-  for (const cssFile of cssFiles) {
-    if (!cssFile.path.endsWith(".css")) {
-      console.error(`Error reading ${cssFile.name}: The file should be CSS`);
-      continue;
+  // Add delimiter
+  process.stderr.write("--- \n");
+
+  // Apply all minifiers to each file
+  const results: Result[] = [];
+
+  for (const cssFile of files) {
+    process.stderr.write(`Opening ${cssFile.name}\n`);
+
+    const measurements: Measurement[] = [];
+    for (const minifier of minifiers) {
+      process.stderr.write(`- Processing with ${minifier.name}\n`);
+
+      const measurement = await measure(cssFile, minifier, gzip);
+      measurements.push(measurement);
     }
 
+    const stats = calcStats(measurements);
+
+    measurements.forEach((measurement) => {
+      const differential = measurement.elapsedTime / stats.bestTime;
+      measurement.differential = differential.toFixed(1);
+    });
+
+    results.push({
+      filename: cssFile.name,
+      originalSize: cssFile.size,
+      originalSizeLabel: bytesToSize(cssFile.size),
+      measurements,
+      stats,
+    });
+  }
+
+  return results;
+};
+
+const readFiles = async (cssFiles: CssFile[], gzip: boolean) => {
+  const filesPromises = cssFiles.map(async (cssFile) => {
+    const payload: CssFileWithContent = {
+      ...cssFile,
+      content: "",
+      size: 0,
+    };
     process.stderr.write(`Reading ${cssFile.name}\n`);
-
     try {
-      const sourcePath = await Bun.resolve(cssFile.path, "node_modules");
-      const source = await Bun.file(sourcePath).text();
-
-      const originalSize = gzip ? getGzipSize(source) : source.length;
-
-      for (const minifier of minifiers) {
-        process.stderr.write(`- Processing with ${minifier.name}\n`);
-
-        const measured = await measure(source, minifier, gzip);
-
-        const efficiency = ((measured.size / originalSize) * 100).toFixed(2);
-
-        const measurement: Measurement = {
-          minifiedSize: measured.size,
-          minifiedSizeLabel: bytesToSize(measured.size),
-          elapsedTime: measured.time,
-          efficiency,
-          minifier: {
-            name: minifier.name,
-            version: minifier.version,
-            url: minifier.url,
-            description: minifier.description,
-          },
-        };
-
-        const root = results.get(cssFile.path) ?? {
-          filename: cssFile.name,
-          originalSize,
-          originalSizeLabel: bytesToSize(originalSize),
-          measurements: [],
-        };
-        root.measurements.push(measurement);
-        results.set(cssFile.path, root);
-      }
-
-      const tempResults = results.get(cssFile.path)!;
-
-      tempResults.stats = calcStats(tempResults.measurements);
-
-      tempResults.measurements = tempResults.measurements.map((measurement) => {
-        const differential =
-          measurement.elapsedTime / tempResults.stats!.bestTime;
-        return {
-          ...measurement,
-          differential: differential.toFixed(1),
-        };
-      });
-    } catch (error) {
+      const sourcePath = path.join("node_modules", cssFile.path);
+      payload.content = await Bun.file(sourcePath).text();
+      payload.size = gzip
+        ? getGzipSize(payload.content)
+        : payload.content.length;
+      return payload;
+    } catch (error: unknown) {
       console.error(
         `- Error reading ${cssFile.name}: ${(error as Error).message}`
       );
+      return payload;
     }
-  }
-
-  return Array.from(results.values());
+  });
+  const files = await Promise.all(filesPromises);
+  return files
+    .filter((cssFile) => cssFile.content)
+    .toSorted((a, b) => a.name.localeCompare(b.name));
 };
 
 const calcStats = (measurements: Measurement[]) => {
@@ -113,23 +118,41 @@ const calcStats = (measurements: Measurement[]) => {
   };
 };
 
-const measure = async (source: string, minifier: Minifier, gzip: boolean) => {
+const measure = async (
+  cssFile: CssFileWithContent,
+  minifier: MinifierWithVersion,
+  gzip: boolean
+) => {
+  const measurement: Measurement = {
+    minifiedSize: 0,
+    minifiedSizeLabel: bytesToSize(0),
+    elapsedTime: 0,
+    efficiency: "0",
+    minifier: {
+      name: minifier.name,
+      version: minifier.version,
+      url: minifier.url,
+      description: minifier.description,
+    },
+  };
+
   try {
     const start = Bun.nanoseconds();
-    const minified = await minifier.build(source);
+    const minified = await minifier.build(cssFile.content);
     const nanoseconds = Bun.nanoseconds() - start;
-    const time = Math.round((nanoseconds / 1_000_000) * 100) / 100;
+    const elapsedTime = Math.round((nanoseconds / 1_000_000) * 100) / 100;
 
-    return {
-      time,
-      size: gzip ? getGzipSize(minified) : minified.length,
-    };
+    const minifiedSize = gzip ? getGzipSize(minified) : minified.length;
+    const efficiency = ((minifiedSize / cssFile.size) * 100).toFixed(2);
+    measurement.minifiedSize = minifiedSize;
+    measurement.minifiedSizeLabel = bytesToSize(minifiedSize);
+    measurement.elapsedTime = elapsedTime;
+    measurement.efficiency = efficiency;
+
+    return measurement;
   } catch (err: unknown) {
     console.error(`-- ${(err as Error).name}: ${(err as Error).message}`);
-    return {
-      time: 0,
-      size: 0,
-    };
+    return measurement;
   }
 };
 
