@@ -59,7 +59,7 @@
     "@types/csso": "^5.0.4",
     "@types/ejs": "^3.1.5",
     "@types/uglifycss": "^0.0.11",
-    "bun-types": "^1.0.21",
+    "bun-types": "^1.0.22",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   }

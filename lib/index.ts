@@ -123,26 +123,28 @@ const measure = async (
   minifier: MinifierWithVersion,
   gzip: boolean
 ) => {
+  const { build, ...minifierInfo } = minifier;
+
   const measurement: Measurement = {
     minifiedSize: 0,
     minifiedSizeLabel: bytesToSize(0),
     elapsedTime: 0,
     efficiency: "0",
-    minifier: {
-      name: minifier.name,
-      version: minifier.version,
-      url: minifier.url,
-      description: minifier.description,
-    },
+    minifier: minifierInfo,
   };
 
   try {
-    const start = Bun.nanoseconds();
-    const minified = await minifier.build(cssFile.content);
-    const nanoseconds = Bun.nanoseconds() - start;
-    const elapsedTime = Math.round((nanoseconds / 1_000_000) * 100) / 100;
+    performance.mark("minify-start");
+    const minified = await build(cssFile.content);
+    performance.mark("minify-end");
+    const measured = performance.measure(
+      "minify-duration",
+      "minify-start",
+      "minify-end"
+    );
 
     const minifiedSize = gzip ? getGzipSize(minified) : minified.length;
+    const elapsedTime = Math.round(measured.duration * 100) / 100;
     const efficiency = ((minifiedSize / cssFile.size) * 100).toFixed(2);
     measurement.minifiedSize = minifiedSize;
     measurement.minifiedSizeLabel = bytesToSize(minifiedSize);
