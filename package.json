@@ -39,28 +39,28 @@
     "cssnano-preset-advanced": "^6.0.3",
     "csso": "5.0.5",
     "ejs": "^3.1.9",
-    "esbuild": "0.19.11",
+    "esbuild": "0.20.0",
     "fomantic-ui": "^2.9.3",
     "foundation-sites": "^6.8.1",
-    "lightningcss": "1.22.1",
+    "lightningcss": "1.23.0",
     "magic.css": "^1.4.8",
     "milligram": "^1.4.1",
     "normalize.css": "^8.0.1",
-    "postcss": "8.4.33",
+    "postcss": "8.4.35",
     "purecss": "^3.0.0",
     "sanitize.css": "^13.0.0",
-    "sass": "^1.69.7",
+    "sass": "1.70.0",
     "spectre.css": "^0.5.9",
     "tachyons": "^4.12.0",
-    "uikit": "^3.17.11"
+    "uikit": "^3.18.2"
   },
   "devDependencies": {
     "@types/clean-css": "^4.2.11",
     "@types/csso": "^5.0.4",
     "@types/ejs": "^3.1.5",
     "@types/uglifycss": "^0.0.11",
-    "bun-types": "^1.0.22",
-    "prettier": "^3.1.1",
+    "bun-types": "^1.0.26",
+    "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   }
 }
